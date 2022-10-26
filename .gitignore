@@ -34,4 +34,5 @@ nb-configuration.xml
 
 # Local environment
 .env
-bin/main/resources/application.properties
+push.bat
+src/main/resources/application.properties
