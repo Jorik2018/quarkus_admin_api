@@ -1,0 +1,1 @@
+"E:\java\jdk-11.0.11\bin\java" -jar build/quarkus-app/quarkus-run.jar

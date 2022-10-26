@@ -1,0 +1,6 @@
+quarkus.http.port=
+quarkus.http.cors=
+quarkus.datasource.db-kind=
+quarkus.datasource.username=
+quarkus.datasource.password= 
+quarkus.datasource.jdbc.url=
