@@ -1,5 +1,5 @@
 quarkus.http.port=
-quarkus.http.cors=
+quarkus.http.cors=true
 quarkus.datasource.db-kind=
 quarkus.datasource.username=
 quarkus.datasource.password= 

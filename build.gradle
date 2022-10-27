@@ -32,6 +32,7 @@ dependencies {
     //implementation 'io.quarkus:quarkus-smallrye-graphql-client'
 
     implementation files('E:/projects/java/spring/isobit/build/libs/isobit.jar')
+    implementation files('D:/java/libs/isobit.jar')
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
 }
