@@ -24,7 +24,7 @@ public class UserRole implements Serializable {
     protected UserRolePK pk;
 
     @Basic(optional = false)
-    private boolean canceled;
+    private boolean active;
     @Transient
     private Role role;
 }

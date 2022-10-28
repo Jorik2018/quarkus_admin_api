@@ -2,11 +2,13 @@ package org.isobit.admin;
 
 import org.isobit.util.Encrypter;
 import org.isobit.admin.Repository;
+import org.isobit.admin.jpa.User;
+
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import org.isobit.admin.jpa.User;
+
 import org.isobit.app.jpa.Role;
 import org.isobit.app.jpa.UserRole;
 import org.isobit.app.jpa.UserRolePK;
@@ -52,15 +54,15 @@ public class Resource {
             User.getEntityManager().merge(_user);
             user=_user;
         }
-        java.util.Collection<UserRole> roles=user.getUserRoles();
+        java.util.Collection<UserRole> userRoles=user.getUserRoles();
         EntityManager em = User.getEntityManager();
-        if(roles!=null){
-            for(UserRole role:roles){
+        if(userRoles!=null){
+            for(UserRole role:userRoles){
                 UserRolePK pk=role.getPk();
                 pk.setUid(user.getUid());
                 UserRole userRole=em.find(UserRole.class,pk);
                 if(userRole==null)userRole=new UserRole();
-                userRole.setCanceled(role.isCanceled());
+                userRole.setActive(role.isActive());
                 if(userRole.getPk()==null){
                     userRole.setPk(pk);
                     em.persist(userRole);

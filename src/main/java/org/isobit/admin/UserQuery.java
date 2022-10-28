@@ -2,14 +2,13 @@ package org.isobit.admin;
 
 import org.eclipse.microprofile.graphql.GraphQLApi;
 import org.eclipse.microprofile.graphql.Query;
-import org.isobit.admin.jpa.User;
 import org.isobit.app.jpa.Role;
+import org.isobit.admin.jpa.User;
 import org.isobit.app.jpa.UserRole;
 import org.isobit.app.jpa.UserRolePK;
+import org.isobit.directory2.jpa.People;
 
 import java.util.*;
-import org.isobit.admin.Repository;
-import java.util.Optional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
@@ -18,15 +17,6 @@ public class UserQuery {
 
     @Inject
     private Repository repository;
-
-    @Query("test")
-    public List<User> gg(){
-        ArrayList l=new ArrayList();
-        User u=new User();
-        l.add(u);
-        return l;
-    }
-
 
     @Query("user")
     public User getUser(int uid,String roleName) {
@@ -52,6 +42,9 @@ public class UserQuery {
                     userRoles.add(ur);
                 }
         }
+        if(user.getDirectoryId()!=null){
+            user.setPeople(em.find(People.class, user.getDirectoryId()));
+        }
         user.setUserRoles(userRoles);
         return user;
     }
@@ -63,6 +56,7 @@ public class UserQuery {
         boolean useRole = role != null && role.length > 0;
         List<javax.persistence.Query> ql = new ArrayList();
         String sql;
+     
         ql.add(em
                 .createQuery(
                         "SELECT DISTINCT u " + (sql = "FROM User u,UserRole ur,Role r WHERE r.rid=ur.pk.rid AND u.uid=ur.pk.uid"
@@ -84,7 +78,13 @@ public class UserQuery {
                 if (roleName != null)
                     q.setParameter("roleName", '%' + roleName.toUpperCase() + '%');
             }
-            return new Result(ql.get(0).getResultList(), ((Number) ql.get(1).getSingleResult()).intValue());
+            List<User> list=ql.get(0).getResultList();
+            list.forEach((user)->{
+                if(user.getDirectoryId()!=null){
+                    user.setPeople(em.find(People.class, user.getDirectoryId()));
+                }
+            });
+            return new Result(list, ((Number) ql.get(1).getSingleResult()).intValue());
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

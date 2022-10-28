@@ -14,9 +14,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import org.isobit.app.jpa.UserRole;
 
+import org.isobit.app.jpa.UserRole;
+import org.isobit.directory2.jpa.People;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import lombok.*;
 
 @Data
@@ -103,7 +105,8 @@ public class User extends PanacheEntityBase implements Serializable{
     private String confirm;
     @Transient
     private Collection<UserRole> userRoles;
-
+    @Transient
+    private People people;
     /*@Override
     public void valueBound(HttpSessionBindingEvent event) {
         Set<User> logins = (Set<User>) event.getSession().getServletContext().getAttribute("logins");
