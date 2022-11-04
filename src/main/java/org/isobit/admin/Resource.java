@@ -8,12 +8,14 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-
-import org.isobit.app.jpa.Role;
-import org.isobit.app.jpa.UserRole;
-import org.isobit.app.jpa.UserRolePK;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.Context;
+import org.isobit.app2.jpa.UserRole;
+import org.isobit.app2.jpa.UserRolePK;
 import javax.persistence.EntityManager;
-import java.util.List;
+
+import java.security.Principal;
+import javax.annotation.security.PermitAll;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,6 +32,15 @@ public class Resource {
         EntityManager em = User.getEntityManager();
         user.setUserRoles(em.createQuery("select ur from UserRole ur where ur.pk.uid=:uid").setParameter("uid", user.getUid()).getResultList());
         return user;
+    }
+
+    @PermitAll
+    @GET
+    @Path("token")
+    public Object getFree (@Context SecurityContext sec) {
+        Principal user = sec.getUserPrincipal(); 
+        String name = user != null ? user.getName() : "anonymous";
+        return name;
     }
 
     @POST

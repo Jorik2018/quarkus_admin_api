@@ -4,3 +4,6 @@ quarkus.datasource.db-kind=
 quarkus.datasource.username=
 quarkus.datasource.password= 
 quarkus.datasource.jdbc.url=
+
+mp.jwt.verify.publickey.location=
+mp.jwt.verify.issuer=https://example.com/issuer

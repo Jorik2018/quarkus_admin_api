@@ -1,4 +1,4 @@
-package org.isobit.app.jpa;
+package org.isobit.app2.jpa;
 
 import java.io.Serializable;
 import javax.persistence.EmbeddedId;

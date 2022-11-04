@@ -15,7 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.isobit.app.jpa.UserRole;
+import org.isobit.app2.jpa.UserRole;
 import org.isobit.directory2.jpa.People;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
