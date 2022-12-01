@@ -3,11 +3,12 @@ package org.isobit.admin;
 import org.eclipse.microprofile.graphql.GraphQLApi;
 import org.eclipse.microprofile.graphql.Query;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.isobit.app2.jpa.Role;
-import org.isobit.admin.jpa.User;
-import org.isobit.app2.jpa.UserRole;
-import org.isobit.app2.jpa.UserRolePK;
-import org.isobit.directory2.jpa.People;
+import org.isobit.admin.jpa.RoleRole;
+import org.isobit.app.jpa.Role;
+import org.isobit.app.jpa.User;
+import org.isobit.app.jpa.UserRole;
+import org.isobit.app.jpa.UserRolePK;
+import org.isobit.directory.jpa.People;
 import org.isobit.util.XUtil;
 
 import java.util.*;
@@ -18,41 +19,75 @@ import javax.persistence.EntityManager;
 
 @GraphQLApi
 public class UserQuery {
-    
+
     @Inject
-    JsonWebToken jwt; 
+    private UserService userService;
 
     @Inject
     private Repository repository;
 
+    @Inject
+    JsonWebToken jwt;
+
     @Query("user")
-    public User getUser(int uid,String roleName) {
-        User user=uid!=0?User.findById(uid):new User();
-        if(uid==0)user.setUid(0);
-        EntityManager em = User.getEntityManager();
-        List<UserRole> userRoles=em.createQuery("select ur from UserRole ur where ur.pk.uid=:uid",UserRole.class).setParameter("uid", user.getUid()).getResultList();
-        Map<Object,UserRole> map=new HashMap<Object,UserRole>();
-        for(UserRole ur:userRoles){
-            ur.setRole(em.find(org.isobit.app2.jpa.Role.class, ur.getPk().getRid()));
-            map.put(ur.getPk().getRid(), ur);
+    @PermitAll
+    public User getUser(Optional<Integer> uid, String roleName) {
+        Integer _uid = 0;
+        User currentUser = userService.getCurrentUser();
+        EntityManager em = RoleRole.getEntityManager();
+        if (uid.isPresent())
+            _uid = uid.get();
+        else {
+            _uid = currentUser.getUid();
         }
-        userRoles=new ArrayList<UserRole>();
-        if(roleName!=null){
-            List<org.isobit.app2.jpa.Role> roles=em.createQuery("SELECT r from Role r where r.name LIKE :roleName",org.isobit.app2.jpa.Role.class)
-                .setParameter("roleName", roleName+"%").getResultList();
-                for(Role r:roles){
-                    UserRole ur=map.get(r.getRid());
-                    if(ur==null){
-                        ur=new UserRole();
-                        ur.setPk(new UserRolePK(user.getUid(),r.getRid()));
-                        ur.setRole(r);
-                    }
-                    userRoles.add(ur);
-                }
+        if(roleName==null)roleName="";
+        User user = _uid != 0 ? em.find(User.class, _uid) : new User();
+        if (user.getUid() == null)
+            user.setUid(0);
+            //List all roles from user changed it to list only accesibles roles by user
+        List<UserRole> userRoles = em.createQuery("select ur from UserRole ur where ur.PK.uid=:uid", UserRole.class)
+                .setParameter("uid", user.getUid()).getResultList();
+        Map<Object, UserRole> map = new HashMap<Object, UserRole>();
+        for (UserRole ur : userRoles) {
+            ur.setRole(em.find(org.isobit.app.jpa.Role.class, ur.getPK().getRid()));
+            map.put(ur.getPK().getRid(), ur);
         }
-        if(user.getDirectoryId()!=null){
-            user.setPeople(em.find(People.class, user.getDirectoryId()));
+        userRoles = new ArrayList<UserRole>();
+        List roleIdList = null;
+        if (currentUser.getUid() != 1) {
+            roleIdList = em
+                    .createQuery(
+                            "SELECT rr.slaveId FROM UserRole ur,RoleRole rr WHERE ur.PK.rid=rr.rid AND ur.PK.uid=:uid",
+                            Integer.class)
+                    .setParameter("uid", currentUser.getUid() ).getResultList();
+            roleIdList.add(0);
         }
+
+        javax.persistence.Query q = em
+                .createQuery(
+                        "SELECT r from Role r WHERE r.name LIKE :roleName"
+                                + (roleIdList != null ? " AND r.rid IN :roles" : "") + " ORDER BY r.name",
+                        org.isobit.app.jpa.Role.class)
+                .setParameter("roleName", roleName + "%");
+
+        if (roleIdList != null) {
+            q.setParameter("roles", roleIdList);
+        }
+        List<org.isobit.app.jpa.Role> roles = q.getResultList();
+        for (Role r : roles) {
+            UserRole ur = map.get(r.getRid());
+            if (ur == null) {
+                ur = new UserRole();
+                ur.setPK(new UserRolePK(user.getUid(), r.getRid()));
+                ur.setRole(r);
+            }
+            userRoles.add(ur);
+        }
+
+        if (user.getDirectoryId() != null) {
+            user.setPeople(em.find(org.isobit.directory.jpa.People.class, user.getDirectoryId()));
+        }
+
         user.setUserRoles(userRoles);
         return user;
     }
@@ -61,21 +96,30 @@ public class UserQuery {
     @PermitAll
     public Result<User> getUserQuery(int offset, int limit, Integer[] role, String name, String fullName,
             String roleName, String email) {
-                int uid=XUtil.intValue(jwt.getClaim("uid"));
-        //only user with roles managed by this user
-        System.out.println("uid==="+uid);
-        EntityManager em = User.getEntityManager();
+        int uid = XUtil.intValue(jwt.getClaim("uid"));
+        EntityManager em = RoleRole.getEntityManager();
         boolean useRole = role != null && role.length > 0;
         List<javax.persistence.Query> ql = new ArrayList();
         String sql;
-     
+        List roleIdList = null;
+        if (uid != 1) {
+            roleIdList = em
+                    .createQuery(
+                            "SELECT rr.slaveId FROM UserRole ur,RoleRole rr WHERE ur.PK.rid=rr.rid AND ur.PK.uid=:uid",
+                            Integer.class)
+                    .setParameter("uid", uid).getResultList();
+            roleIdList.add(0);
+        }
+        System.out.println("rl=" + roleIdList);
         ql.add(em
                 .createQuery(
-                        "SELECT DISTINCT u " + (sql = "FROM User u,UserRole ur,Role r WHERE r.rid=ur.pk.rid AND u.uid=ur.pk.uid"
-                                + (useRole ? " AND ur.pk.rid IN :rid" : "")
-                                + (name != null ? " AND UPPER(u.name) LIKE :name" : "")
-                                + (email != null ? " AND UPPER(u.mail) LIKE :email" : "")
-                                + (roleName != null ? " AND UPPER(r.name) Like :roleName" : "")))
+                        "SELECT DISTINCT u "
+                                + (sql = "FROM User u,UserRole ur,Role r WHERE r.rid=ur.PK.rid AND u.uid=ur.PK.uid"
+                                        + (useRole ? " AND ur.PK.rid IN :rid" : "")
+                                        + (name != null ? " AND UPPER(u.name) LIKE :name" : "")
+                                        + (email != null ? " AND UPPER(u.mail) LIKE :email" : "")
+                                        + (roleIdList != null ? " AND ur.PK.rid IN :roles" : "")
+                                        + (roleName != null ? " AND UPPER(r.name) Like :roleName" : "")))
                 .setFirstResult(offset)
                 .setMaxResults(limit));
         try {
@@ -83,6 +127,9 @@ public class UserQuery {
             for (javax.persistence.Query q : ql) {
                 if (useRole)
                     q.setParameter("rid", Arrays.asList(role));
+                if (roleIdList != null)
+                    q.setParameter("roles", roleIdList);
+
                 if (name != null)
                     q.setParameter("name", '%' + name.toUpperCase() + '%');
                 if (email != null)
@@ -90,9 +137,9 @@ public class UserQuery {
                 if (roleName != null)
                     q.setParameter("roleName", '%' + roleName.toUpperCase() + '%');
             }
-            List<User> list=ql.get(0).getResultList();
-            list.forEach((user)->{
-                if(user.getDirectoryId()!=null){
+            List<User> list = ql.get(0).getResultList();
+            list.forEach((user) -> {
+                if (user.getDirectoryId() != null) {
                     user.setPeople(em.find(People.class, user.getDirectoryId()));
                 }
             });
