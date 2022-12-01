@@ -7,3 +7,9 @@ quarkus.datasource.jdbc.url=
 
 mp.jwt.verify.publickey.location=
 mp.jwt.verify.issuer=https://example.com/issuer
+smallrye.jwt.expiration.grace=360
+
+quarkus.http.auth.permission.bearer.paths=/graphql*
+quarkus.http.auth.permission.bearer.policy=authenticated
+quarkus.http.auth.permission.bearer.auth-mechanism=bearer
+quarkus.hibernate-orm.packages=org.isobit.directory.jpa,org.isobit.admin.jpa,org.isobit.app.jpa
