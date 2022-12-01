@@ -12,6 +12,7 @@ public class ResourceTest {
     @Test
     public void testHelloEndpoint() {
        /* given()
+       
           .when().get("/")
           .then()
              .statusCode(200)
