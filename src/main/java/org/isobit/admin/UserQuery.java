@@ -94,7 +94,9 @@ public class UserQuery {
 
     @Query("users")
     @PermitAll
-    public Result<User> getUserQuery(int offset, int limit, Integer[] role, String name, String fullName,
+    
+    public Result<User> getUserQuery(int offset, int limit, Integer[] role, 
+    String name, String fullName,
             String roleName, String email) {
         int uid = XUtil.intValue(jwt.getClaim("uid"));
         EntityManager em = RoleRole.getEntityManager();
