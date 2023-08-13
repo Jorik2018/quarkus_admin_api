@@ -34,5 +34,6 @@ nb-configuration.xml
 
 # Local environment
 .env
-push.bat
-src/main/resources/application.properties
+
+# Plugin directory
+/.quarkus/cli/plugins/

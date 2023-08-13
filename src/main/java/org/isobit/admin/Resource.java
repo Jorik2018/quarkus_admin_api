@@ -3,29 +3,30 @@ package org.isobit.admin;
 import org.isobit.util.Encrypter;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.isobit.admin.Repository;
-import org.isobit.admin.jpa.RoleRole;
+import org.isobit.admin.model.RoleRole;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.Context;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.Context;
 
-import org.isobit.app.jpa.User;
-import org.isobit.app.jpa.UserRole;
-import org.isobit.app.jpa.UserRolePK;
-import org.isobit.directory.jpa.Directory;
-import org.isobit.directory.jpa.DocumentType;
-import org.isobit.directory.jpa.People;
+import org.isobit.app.model.User;
+import org.isobit.app.model.UserRole;
+import org.isobit.app.model.UserRolePK;
+import org.isobit.app.service.UserService;
+import org.isobit.directory.model.Directory;
+import org.isobit.directory.model.DocumentType;
+import org.isobit.directory.model.People;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 
 import java.security.Principal;
-import javax.annotation.security.PermitAll;
+import jakarta.annotation.security.PermitAll;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -42,7 +43,7 @@ public class Resource {
     @Path("role/{from:\\d+}/{to:\\d+}")
     @PermitAll
     public Object getRoles(@PathParam("from") int from,@PathParam("to") int to) {
-        org.isobit.app.jpa.User u=userService.getCurrentUser();
+        org.isobit.app.model.User u=userService.getCurrentUser();
         
         EntityManager em=RoleRole.getEntityManager();
         List roleIdList=null;
@@ -68,10 +69,10 @@ public class Resource {
 
     @POST
     @Path("user")
-    @javax.transaction.Transactional
+    @jakarta.transaction.Transactional
     public Object postUser(User user) {
         String pass=user.getPass();
-        org.isobit.app.jpa.User cu=userService.getCurrentUser();
+        org.isobit.app.model.User cu=userService.getCurrentUser();
         if(pass!=null&&pass.length()>0){
             pass=new Encrypter().encode(Encrypter.MD5,pass);
         }else pass=null;

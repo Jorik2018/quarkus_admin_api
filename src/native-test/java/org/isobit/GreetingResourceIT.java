@@ -1,8 +1,8 @@
-package org.isobib.admin;
+package org.isobit;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-public class ResourceIT extends ResourceTest {
+public class GreetingResourceIT extends GreetingResourceTest {
     // Execute the same tests but in packaged mode.
 }

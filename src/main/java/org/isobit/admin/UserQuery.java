@@ -3,19 +3,20 @@ package org.isobit.admin;
 import org.eclipse.microprofile.graphql.GraphQLApi;
 import org.eclipse.microprofile.graphql.Query;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.isobit.admin.jpa.RoleRole;
-import org.isobit.app.jpa.Role;
-import org.isobit.app.jpa.User;
-import org.isobit.app.jpa.UserRole;
-import org.isobit.app.jpa.UserRolePK;
-import org.isobit.directory.jpa.People;
+import org.isobit.admin.model.RoleRole;
+import org.isobit.app.model.Role;
+import org.isobit.app.model.User;
+import org.isobit.app.model.UserRole;
+import org.isobit.app.model.UserRolePK;
+import org.isobit.app.service.UserService;
+import org.isobit.directory.model.People;
 import org.isobit.util.XUtil;
 
 import java.util.*;
 
-import javax.annotation.security.PermitAll;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import jakarta.annotation.security.PermitAll;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 @GraphQLApi
 public class UserQuery {
@@ -49,7 +50,7 @@ public class UserQuery {
                 .setParameter("uid", user.getUid()).getResultList();
         Map<Object, UserRole> map = new HashMap<Object, UserRole>();
         for (UserRole ur : userRoles) {
-            ur.setRole(em.find(org.isobit.app.jpa.Role.class, ur.getPK().getRid()));
+            ur.setRole(em.find(org.isobit.app.model.Role.class, ur.getPK().getRid()));
             map.put(ur.getPK().getRid(), ur);
         }
         userRoles = new ArrayList<UserRole>();
@@ -63,17 +64,17 @@ public class UserQuery {
             roleIdList.add(0);
         }
 
-        javax.persistence.Query q = em
+        jakarta.persistence.Query q = em
                 .createQuery(
                         "SELECT r from Role r WHERE r.name LIKE :roleName"
                                 + (roleIdList != null ? " AND r.rid IN :roles" : "") + " ORDER BY r.name",
-                        org.isobit.app.jpa.Role.class)
+                        org.isobit.app.model.Role.class)
                 .setParameter("roleName", roleName + "%");
 
         if (roleIdList != null) {
             q.setParameter("roles", roleIdList);
         }
-        List<org.isobit.app.jpa.Role> roles = q.getResultList();
+        List<org.isobit.app.model.Role> roles = q.getResultList();
         for (Role r : roles) {
             UserRole ur = map.get(r.getRid());
             if (ur == null) {
@@ -85,7 +86,7 @@ public class UserQuery {
         }
 
         if (user.getDirectoryId() != null) {
-            user.setPeople(em.find(org.isobit.directory.jpa.People.class, user.getDirectoryId()));
+            user.setPeople(em.find(org.isobit.directory.model.People.class, user.getDirectoryId()));
         }
 
         user.setUserRoles(userRoles);
@@ -101,7 +102,7 @@ public class UserQuery {
         int uid = XUtil.intValue(jwt.getClaim("uid"));
         EntityManager em = RoleRole.getEntityManager();
         boolean useRole = role != null && role.length > 0;
-        List<javax.persistence.Query> ql = new ArrayList();
+        List<jakarta.persistence.Query> ql = new ArrayList();
         String sql;
         List roleIdList = null;
         if (uid != 1) {
@@ -126,7 +127,7 @@ public class UserQuery {
                 .setMaxResults(limit));
         try {
             ql.add(em.createQuery("SELECT COUNT(DISTINCT u) " + sql, Number.class));
-            for (javax.persistence.Query q : ql) {
+            for (jakarta.persistence.Query q : ql) {
                 if (useRole)
                     q.setParameter("rid", Arrays.asList(role));
                 if (roleIdList != null)
