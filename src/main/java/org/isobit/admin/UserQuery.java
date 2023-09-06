@@ -25,14 +25,12 @@ public class UserQuery {
     private UserService userService;
 
     @Inject
-    private Repository repository;
-
-    @Inject
     JsonWebToken jwt;
 
     @Query("user")
     @PermitAll
     public User getUser(Optional<Integer> uid, String roleName) {
+        System.out.println("getuser");
         Integer _uid = 0;
         User currentUser = userService.getCurrentUser();
         EntityManager em = RoleRole.getEntityManager();

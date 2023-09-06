@@ -62,6 +62,7 @@ public class Resource {
     @GET
     @Path("token")
     public Object getFree (@Context SecurityContext sec) {
+        System.out.println("22222");
         Principal user = sec.getUserPrincipal(); 
         String name = user != null ? user.getName() : "anonymous";
         return name;
