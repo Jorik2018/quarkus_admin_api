@@ -1,5 +1,7 @@
 quarkus.http.port=
 quarkus.http.cors=true
+quarkus.http.cors.origins=*
+quarkus.http.cors.methods=GET,PUT,POST,OPTIONS,DELETE
 quarkus.datasource.db-kind=
 quarkus.datasource.username=
 quarkus.datasource.password= 
