@@ -28,6 +28,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
     implementation 'io.quarkus:quarkus-rest-client'
     implementation 'io.quarkus:quarkus-rest-client-jackson'
+    implementation 'com.google.code.gson:gson:2.11.0'
     implementation files('C:/projects/java/spring/java_isobit/build/libs/isobit.jar')
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
