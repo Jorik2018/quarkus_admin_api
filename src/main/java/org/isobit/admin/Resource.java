@@ -74,7 +74,7 @@ public class Resource {
             @QueryParam("name") String name,
             @QueryParam("people") String people,
             @QueryParam("mail") String mail) {
-        
+
         EntityManager em = RoleRole.getEntityManager();
 
         StringBuilder jpql = new StringBuilder(
@@ -324,4 +324,17 @@ public class Resource {
         return user;
     }
 
+    private boolean isEmpty(String value) {
+        return value == null ||
+                value.trim().isEmpty();
+    }
+
+    private String toLike(String value) {
+        return "%" +
+                value.trim()
+                        .toUpperCase()
+                        .replace(" ", "%")
+                +
+                "%";
+    }
 }
