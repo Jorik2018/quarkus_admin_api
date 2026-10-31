@@ -74,8 +74,8 @@ public class Resource {
             @QueryParam("name") String name,
             @QueryParam("people") String people,
             @QueryParam("mail") String mail) {
-
-        EntityManager em = User.getEntityManager();
+        
+        EntityManager em = RoleRole.getEntityManager();
 
         StringBuilder jpql = new StringBuilder(
                 "SELECT u FROM User u ");
