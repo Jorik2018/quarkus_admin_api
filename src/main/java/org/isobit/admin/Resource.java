@@ -202,7 +202,7 @@ public class Resource {
             }
 
             users.forEach(user -> {
-
+                user.setPass(null);
                 String fullName = peopleMap.get(user.getDirectoryId());
                 People p = new People();
                 if (fullName != null) {
