@@ -176,7 +176,7 @@ public class Resource {
          */
 
         List<Integer> peopleIds = users.stream()
-                .map(User::getIdDir)
+                .map(User::getDirectoryId)
                 .filter(id -> id != null && id > 0)
                 .distinct()
                 .collect(Collectors.toList());
@@ -203,7 +203,7 @@ public class Resource {
 
             users.forEach(user -> {
 
-                String fullName = peopleMap.get(user.getIdDir());
+                String fullName = peopleMap.get(user.getDirectoryId());
 
                 if (fullName != null) {
                     user.setExt(fullName);
