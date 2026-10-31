@@ -204,24 +204,17 @@ public class Resource {
             users.forEach(user -> {
 
                 String fullName = peopleMap.get(user.getDirectoryId());
-
+                People people = new People();
                 if (fullName != null) {
-                    user.setExt(fullName);
+                    people.setFullName(fullName);
+                    user.setPeople(people);
                 }
             });
         }
-
-        /*
-         * Respuesta REST.
-         */
-
         Map<String, Object> response = new HashMap<>();
 
         response.put("data", users);
         response.put("total", total);
-        response.put("first", first);
-        response.put("pageSize", pageSize);
-
         return response;
     }
 
