@@ -156,7 +156,7 @@ public class Resource {
             countQuery.setParameter("people", value);
         }
 
-        if (pageSize > 0) {
+        if (to > 0) {
             query.setFirstResult(from);
             query.setMaxResults(to);
         }
@@ -165,10 +165,6 @@ public class Resource {
         List<User> users = query.getResultList();
 
         long total = ((Number) countQuery.getSingleResult()).longValue();
-
-        /*
-         * Nunca devolver password.
-         */
 
         users.forEach(user -> {
             em.detach(user);
