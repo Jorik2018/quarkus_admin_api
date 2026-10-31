@@ -204,10 +204,10 @@ public class Resource {
             users.forEach(user -> {
 
                 String fullName = peopleMap.get(user.getDirectoryId());
-                People people = new People();
+                People p = new People();
                 if (fullName != null) {
-                    people.setFullName(fullName);
-                    user.setPeople(people);
+                    p.setFullName(fullName);
+                    user.setPeople(p);
                 }
             });
         }
