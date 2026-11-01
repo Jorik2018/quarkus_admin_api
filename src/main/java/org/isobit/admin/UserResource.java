@@ -141,7 +141,7 @@ public class UserResource {
         @SuppressWarnings("unchecked")
         List<User> users = query.getResultList();
 
-        long total = ((Number) countQuery.getSingleResult()).longValue();
+        long size = ((Number) countQuery.getSingleResult()).longValue();
 
         users.forEach(user -> {
             em.detach(user);
@@ -191,7 +191,7 @@ public class UserResource {
         Map<String, Object> response = new HashMap<>();
 
         response.put("data", users);
-        response.put("total", total);
+        response.put("size", size);
         return response;
     }
 
