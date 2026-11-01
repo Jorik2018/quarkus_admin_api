@@ -73,11 +73,11 @@ public class UserResource {
 
         if (!isEmpty(people)) {
             jpql.append(
-                    "AND u.idDir = p.id " +
+                    "AND u.directoryId = p.id " +
                             "AND UPPER(p.fullName) LIKE :people ");
 
             countJpql.append(
-                    "AND u.idDir = p.id " +
+                    "AND u.directoryId = p.id " +
                             "AND UPPER(p.fullName) LIKE :people ");
         }
 
