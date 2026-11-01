@@ -32,7 +32,7 @@ import jakarta.persistence.Query;
 import java.security.Principal;
 import jakarta.annotation.security.PermitAll;
 
-@Path("/")
+@Path("/role")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class Resource {
@@ -44,7 +44,7 @@ public class Resource {
     private UserService userService;
 
     @GET
-    @Path("role/{from:\\d+}/{to:\\d+}")
+    @Path("/{from:\\d+}/{to:\\d+}")
     @PermitAll
     public Object getRoles(@PathParam("from") int from, @PathParam("to") int to) {
         org.isobit.app.model.User u = userService.getCurrentUser();
@@ -216,16 +216,6 @@ public class Resource {
         response.put("data", users);
         response.put("total", total);
         return response;
-    }
-
-    @PermitAll
-    @GET
-    @Path("token")
-    public Object getFree(@Context SecurityContext sec) {
-        System.out.println("22222");
-        Principal user = sec.getUserPrincipal();
-        String name = user != null ? user.getName() : "anonymous";
-        return name;
     }
 
     @POST
