@@ -35,7 +35,7 @@ import jakarta.annotation.security.PermitAll;
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class Resource {
+public class UserResource {
 
     @Inject
     private Repository repository;
